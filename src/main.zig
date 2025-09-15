@@ -47,12 +47,14 @@ pub const ParserData = struct {
 pub const VTParser = struct {
     data: ParserData,
     cb: ParserCallback,
+    user_data: ?*anyopaque,
     //     void*              user_data;
 
-    pub fn init(cb: ParserCallback) VTParser {
+    pub fn init(cb: ParserCallback, user_data: ?*anyopaque) VTParser {
         return VTParser{
             .data = ParserData.init(),
             .cb = cb,
+            .user_data = user_data,
         };
     }
 
@@ -158,12 +160,12 @@ pub const VTParser = struct {
 };
 
 fn testCallback(parser_state: *const ParserData, to_action: pt.Action, ch: u8) void {
-    std.debug.print("Recieved action: {?}, State: {?} parser, char: {?}\n", .{ to_action, parser_state, ch });
+    std.debug.print("Recieved action: {}, State: {} parser, char: {}\n", .{ to_action, parser_state, ch });
 }
 
 test "VTParser" {
     const input = [_]u8{ 27, '[', '2', '2', 'm', 'a', 'b', 'c', 'd' };
 
-    var parser = VTParser.init(testCallback);
+    var parser = VTParser.init(testCallback, null);
     parser.parse(&input);
 }
